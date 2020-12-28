@@ -76,4 +76,16 @@ public final class BankCard {
     public int hashCode() {
         return Objects.hash(cardNumber);
     }
+
+    @Override
+    public String toString() {
+        return "BankCard{" +
+                "owner='" + owner + '\'' +
+                ", cardNumber=" + cardNumber +
+                ", expirationDate=" + expirationDate +
+                ", cardType=" + cardType +
+                ", currency=" + currency +
+                ", password='" + password + '\'' +
+                '}';
+    }
 }

@@ -1,6 +1,7 @@
 package service;
 
 import com.company.Account;
+import enums.Banks;
 import enums.CardType;
 import enums.Currency;
 import exceptions.InvalidUserException;
@@ -10,12 +11,14 @@ import model.Customer;
 import model.Menu;
 
 import javax.naming.InvalidNameException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class AmeriaBank implements Bank {
     private static AmeriaBank instance;
-    private static ArrayList<Customer> customers = new ArrayList<>();
+    private static final Banks NAME = Banks.AMERIA;
+    private static final ArrayList<Customer> CUSTOMERS = new ArrayList<>();
 
     public static AmeriaBank getInstance() {
         if (instance == null) {
@@ -25,33 +28,43 @@ public class AmeriaBank implements Bank {
     }
 
     public static ArrayList<Customer> getCustomers() {
-        return customers;
+        return CUSTOMERS;
     }
 
     @Override
     public void addCustomer(Customer customer) {
-        if (customer == null || customers.contains(customer)) {
+        if (customer == null || CUSTOMERS.contains(customer)) {
             return;
         }
-        customers.add(customer);
+        CUSTOMERS.add(customer);
     }
 
     @Override
     public void removeCustomer(Customer customer) {
-        customers.remove(customer);
+        CUSTOMERS.remove(customer);
     }
 
     @Override
     public int customersCount() {
-        return customers.size();
+        return CUSTOMERS.size();
     }
 
     @Override
     public void printCustomers() {
-        for (var customer : customers
+        for (var customer : CUSTOMERS
         ) {
             System.out.println(customer.toString());
         }
+    }
+
+    @Override
+    public boolean containsCustomer(Customer customer) {
+        for (Customer value : CUSTOMERS) {
+            if (value.equals(customer)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -65,31 +78,36 @@ public class AmeriaBank implements Bank {
             if (scanner.nextInt() == 1) cd = CardType.VISA;
 
             BankCard bankCard = bankCardService.generateCard(customer.getFirstName() + " " + customer.getLastName(), cd, Currency.AMD);
+            if (containsCustomer(customer)) {
+                for (Customer value : CUSTOMERS) {
+                    if (value.equals(customer)) {
+                        value.addAccount(new Account(bankCard));
+                        DataRead_Write.update(NAME,value);
 
-            for (Customer value : customers) {
-                if (value.equals(customer)) {
-                    value.addAccount(new Account(bankCard));
+                    }
                 }
+            } else {
+                customer.addAccount(new Account(bankCard));
+                addCustomer(customer);
+                DataRead_Write.write(NAME, customer);
+
             }
 
+
         } else if (selectedItem >= 2) {
-            if (!customers.contains(customer))
+            if (!CUSTOMERS.contains(customer))
                 throw new InvalidUserException("Can't find selected user in customers list");
             int payment = 10000 + (int) (Math.random() * 90000);
             System.out.println("Your Utility Payments are " + payment);
-            for (Customer value : customers) {
-                if (value.equals(customer)) {
-                    value.getAccounts().get(selectedItem - 2).withDrawMoney(payment);
-                }
-            }
-            for (int i = 0; i < customers.size(); i++) {
-                Customer c = customers.get(i);
-                if(c.equals(customer)){
-                    System.out.println(customers.get(i).getAccounts().get(selectedItem - 2).getBalance());
+
+            for (int i = 0; i < CUSTOMERS.size(); i++) {
+                Customer c = CUSTOMERS.get(i);
+                if (c.equals(customer)) {
                     c.getAccounts().get(selectedItem - 2).withDrawMoney(payment);
-                    customers.set(i, c);
+                    CUSTOMERS.set(i, c);
+                    DataRead_Write.update(NAME, c);
+
                 }
-                System.out.println(customers.get(i).getAccounts().get(selectedItem - 2).getBalance());
             }
         }
     }

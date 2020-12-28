@@ -11,7 +11,7 @@ public class Customer {
     private final String firstName;
     private final String lastName;
     private final String passport;
-    private ArrayList<Account> accounts;
+    private final ArrayList<Account> accounts;
 
     public Customer(String firstName, String lastName, String passport, ArrayList<Account> accounts) throws InvalidNameException {
         Validations.validateName(firstName);
@@ -51,7 +51,7 @@ public class Customer {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Customer customer = (Customer) o;
-        return Objects.equals(passport, customer.passport);
+        return (passport.equals(customer.passport));
     }
 
     @Override

@@ -17,11 +17,10 @@ public class BankCardService {
             id = (last + 1) % LIMIT;
         }
         ++last;
-        System.out.println(last);
         YearMonth yearMonth = YearMonth.now();
         YearMonth expirationDate = YearMonth.of(yearMonth.getYear() + 4, yearMonth.getMonth());
 
-        int pin = 1000 + (int)(Math.random() * 9000);
-        return new BankCard(fullName, id, expirationDate, cardType, currency,pin);
+        int pin = 1000 + (int) (Math.random() * 9000);
+        return new BankCard(fullName, id, expirationDate, cardType, currency, pin);
     }
 }
